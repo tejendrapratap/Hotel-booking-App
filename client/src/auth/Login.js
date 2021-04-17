@@ -25,6 +25,7 @@ const Login = ({ history }) => {
           type: "LOGGED_IN_USER",
           payload: res.data,
         });
+        toast.success("Login Success");
         history.push("/");
       }
     } catch (err) {
