@@ -43,6 +43,9 @@ const TopNav = () => {
           <Link className="nav-link" to="/register">
             Register
           </Link>
+          <Link className="nav-link" to="/resetPassword">
+            Reset Password
+          </Link>
         </>
       )}
     </div>

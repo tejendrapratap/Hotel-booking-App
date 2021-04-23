@@ -25,6 +25,12 @@ const userSchema = new Schema(
     stripe_account_id: "",
     stripe_seller: {},
     stripeSession: {},
+    resetToken: {
+      type: String,
+    },
+    expireToken: {
+      type: Date,
+    }
   },
   { timestamps: true }
 );

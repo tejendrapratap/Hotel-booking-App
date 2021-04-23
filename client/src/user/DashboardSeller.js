@@ -17,6 +17,7 @@ const DashboardSeller = () => {
      try{
         let res = await createConnectAccount(auth.token);
         console.log(res);
+        setLoading(false);
      }catch(err) {
          console.log(err);
          toast.error("stripe connect failed,Try again.");

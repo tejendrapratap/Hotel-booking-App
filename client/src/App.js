@@ -9,6 +9,9 @@ import Register from "./auth/Register";
 import Dashboard from "./user/Dashboard";
 import DashboardSeller from './user/DashboardSeller';
 import NewHotel from './hotels/NewHotel';
+import ResetPassword from "./components/ResetPassword";
+import NewPasswordSetup from "./components/NewPasswordSetup";
+
 
 function App() {
   return (
@@ -22,6 +25,8 @@ function App() {
         <PrivateRoute exact path="/dashboard" component={Dashboard} />
         <PrivateRoute exact path="/dashboard/seller" component={DashboardSeller} />
         <PrivateRoute exact path="/hotels/new" component={NewHotel} />
+        <Route exact path="/resetPassword" component={ResetPassword} />
+        <Route exact path="/resetPassword/:token" component={NewPasswordSetup} />
       </Switch>
     </BrowserRouter>
   );
