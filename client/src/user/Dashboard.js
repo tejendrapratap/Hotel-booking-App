@@ -7,8 +7,8 @@ const Dashboard = () => {
         <>
             <div className="container-fluid bg-secondary p-5 text-center">
                 <ConnectNav />
-
             </div>
+
             <div className="container-fluid p-4">
                 <DashboardNav />
             </div>
@@ -20,7 +20,7 @@ const Dashboard = () => {
                    <div className="col-md-2">
                        <Link to="/" className="btn btn-primary">Browse Hotels</Link>
                    </div>
-               </div>
+               </div>   
             </div>
         </>
     );
