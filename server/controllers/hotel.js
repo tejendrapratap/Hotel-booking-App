@@ -31,5 +31,19 @@ export const hotels = async(req,res) =>{
    // take max 24 data as response
    let all = await Hotel.find({}).limit(24).select('-image.data').populate('postedBy','_id name').exec();
    res.json(all);
+};
 
+export const image= async(req,res) => {
+   let hotel = await Hotel.findById(req.params.hotelId).exec();
+   if(hotel && hotel.image && hotel.image.data !== null){
+      res.set('Content-Type',hotel.image.contentType)
+      return res.send(hotel.image.data);
+   }
+};
+
+export const sellerHotels = async (req,res) =>{
+   let all = await Hotel.find({postedBy: req.user._id}).select('-image.data')
+   .populate('postedBy', '_id name').exec();
+
+   res.send(all);
 }

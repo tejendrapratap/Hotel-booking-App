@@ -6,7 +6,7 @@ const Home = () => {
   const {auth} = useSelector((state)=>({...state}));
   const [hotels, setHotels] = useState([]);
   useEffect(() => {
-    loadAllhotels();
+    if(auth && auth.token) loadAllhotels();
   },[])
   const loadAllhotels = async () => {
     let res = await allHotels(auth.token);
