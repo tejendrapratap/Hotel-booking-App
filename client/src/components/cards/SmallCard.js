@@ -3,7 +3,12 @@ import { useHistory } from 'react-router'
 import { Link } from 'react-router-dom'
 import { currencyFormatter, diffDays } from '../../actions/stripe'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
-const SmallCard = ({h,handleHotelDelete = (f)=> f,owner = false,showViewMoreButton = true}) => {
+const SmallCard = ({
+    h,
+    handleHotelDelete = (f)=> f,
+    owner = false,
+    showViewMoreButton = true,
+}) => {
     const history = useHistory();
     return (
         <>
@@ -49,7 +54,8 @@ const SmallCard = ({h,handleHotelDelete = (f)=> f,owner = false,showViewMoreButt
                                 <Link to ={`/hotel/edit/${h._id}`}>
                                     <EditOutlined className="text-warning"/>
                                 </Link>
-                                <DeleteOutlined onClick={() => handleHotelDelete(h._id)}
+                                <DeleteOutlined 
+                                    onClick={() => handleHotelDelete(h._id)}
                                     className="text-danger"
                                 />
                                     </>)

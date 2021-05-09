@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { useSelector } from 'react-redux'
 import { HomeOutlined } from '@ant-design/icons'
 import { createConnectAccount } from '../actions/stripe'
-import {sellerHotels} from '../actions/hotel'
+import {sellerHotels, deleteHotel} from '../actions/hotel'
 import { toast } from "react-toastify";
 import { useState,useEffect } from 'react';
 import SmallCard from '../components/cards/SmallCard'
@@ -30,12 +30,19 @@ const DashboardSeller = () => {
             setLoading(false);
         } catch (err) {
             console.log(err);
-            toast.error("stripe connect failed,Try again.");
+            toast.error("Stripe connect failed,Try again.");
             setLoading(false);
         }
 
     };
 
+    const handleHotelDelete = async (hotelId) => {
+        if(!window.confirm("Are you sure?")) return;
+        deleteHotel(auth.token, hotelId).then((res)=>{
+            toast.success("Hotel Deleted");
+            loadSellersHotels();
+        });
+    };
 
     const connected = () => (
         <div className="container-fluid">
@@ -50,7 +57,15 @@ const DashboardSeller = () => {
                 </div>
             </div>
             <div className="row">
-                {hotels.map(h=> <SmallCard key={h._id} h={h} showViewMoreButton={false} owner={true}/>)}
+                {hotels.map((h)=> (
+                <SmallCard 
+                key={h._id} 
+                h={h} 
+                showViewMoreButton={false}
+                owner={true}
+                handleHotelDelete={handleHotelDelete}
+                />
+                ))}
             </div>
         </div>
     );

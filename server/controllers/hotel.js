@@ -46,4 +46,44 @@ export const sellerHotels = async (req,res) =>{
    .populate('postedBy', '_id name').exec();
 
    res.send(all);
+};
+
+export const remove = async(req, res)=> {
+   let removed = await Hotel.findByIdAndDelete(req.params.hotelId)
+   .select("-image.data")
+   .exec();
+   res.json(removed);
+};
+
+export const read = async (req, res) => {
+   let hotel =await Hotel.findById(req.params.hotelId)
+   .select("-image.data")
+   .exec();
+   console.log("SINGLE HOTEL", hotel);
+   res.json(hotel);
+};
+
+export const update = async(req, res) => {
+   try {
+      let fields = req.fields;
+      let files = req.files;
+
+      let data = {...fields}
+
+      if(files.image){
+         let image = {};
+         image.data = fs.readFileSync(files.image.path);
+         image.contentType = files.image.type;
+
+         data.image = image;
+      }
+
+      let updated = await Hotel.findByIdAndUpdate(req.params.hotelId, data, {
+         new: true,
+      }).select("-image.data");
+      res.json(updated);
+   }catch (err){
+      console.log(err)
+      re.status(400).send('Hotel update failed. Try again')
+   }
 }
