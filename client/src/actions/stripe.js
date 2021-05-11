@@ -47,8 +47,21 @@ export const payoutSetting = async (token) => {
 };
 export const currencyFormatter = (data) => {
   // data :[{amount: 10,currentcy:"usd", source_types:[object]}]
-  return data.amount.toLocaleString(data.currency, {
+  return (data.amount / 100).toLocaleString(data.currency, {
     style: "currency",
     currency: data.currency,
   });
 };
+
+export const getSessionId = async (token, hotelId) =>
+  await axios.post(
+    `${process.env.REACT_APP_API}/stripe-session-id`,
+    {
+      hotelId,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );

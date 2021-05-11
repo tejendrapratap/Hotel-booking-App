@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { read, diffDays } from "../actions/hotel";
 import moment from "moment";
+import { useSelector } from "react-redux";
+import { getSessionId } from "../actions/stripe";
+import { loadStripe } from "@stripe/stripe-js";
 
-const ViewHotel = ({ match }) => {
+const ViewHotel = ({ match, history }) => {
   const [hotel, setHotel] = useState({});
   const [image, setImage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const { auth } = useSelector((state) => ({ ...state }));
+
   useEffect(() => {
     loadSellerHotel();
   }, []);
@@ -14,6 +21,21 @@ const ViewHotel = ({ match }) => {
     //console.log(res);
     setHotel(res.data);
     setImage(`${process.env.REACT_APP_API}/hotel/image/${res.data._id}`);
+  };
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    if (!auth) history.push("/login");
+    console.log(auth.token, match.params.hotelId);
+    let res = await getSessionId(auth.token, match.params.hotelId);
+    // console.log("Get sessionId response", res.data.sessionId);
+    const stripe = await loadStripe(process.env.REACT_APP_STRIPE_KEY);
+    stripe
+      .redirectToCheckout({
+        sessionId: res.data.sessionId,
+      })
+      .then((result) => console.log(result));
   };
 
   return (
@@ -47,8 +69,16 @@ const ViewHotel = ({ match }) => {
             </p>
             <i>Posted by {hotel.postedBy && hotel.postedBy.name}</i>
             <br />
-            <button className="btn btn-block btn-lg btn-primary mt-3">
-              Book Now
+            <button
+              onClick={handleClick}
+              className="btn btn-block btn-lg btn-primary mt-3"
+              disabled={loading}
+            >
+              {loading
+                ? "Loading..."
+                : auth && auth.token
+                ? "Book Now"
+                : "Login to Book"}
             </button>
           </div>
         </div>
