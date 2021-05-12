@@ -1,6 +1,7 @@
 import User from "../models/user";
 import Stripe from "stripe";
 import queryString from "query-string";
+import Hotel from "../models/hotel";
 
 const stripe = Stripe(process.env.STRIPE_SECRET);
 
@@ -10,10 +11,19 @@ export const createConnectAccount = async (req, res) => {
   const user = await User.findById(req.user._id).exec();
 
   //if user don't have stripe_account_id
-  if (!user.stripe_account_id) {
+  // !user.stripe_account_id
+  if (true) {
     const account = await stripe.accounts.create({
       type: "express",
       country: "US",
+      capabilities: {
+        card_payments: {
+          requested: true,
+        },
+        transfers: {
+          requested: true,
+        },
+      },
     });
     user.stripe_account_id = account.id;
     user.save();
@@ -116,7 +126,7 @@ export const stripeSessionId = async (req, res) => {
   // 1) get hotel id from req.body
   const { hotelId } = req.body;
   // 2) find the hotel based on hotel in from db
-  const item = await hotel.findById(hotelId).populate("postedBy").exec();
+  const item = await Hotel.findById(hotelId).populate("postedBy").exec();
   // 3) charge - 20% as application fee
   const fee = (item.price * 20) / 100;
   // 4) create a session
