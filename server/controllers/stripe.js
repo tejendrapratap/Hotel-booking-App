@@ -2,6 +2,8 @@ import User from "../models/user";
 import Stripe from "stripe";
 import queryString from "query-string";
 import Hotel from "../models/hotel";
+import Order from '../models/order'
+import user from "../models/user";
 
 const stripe = Stripe(process.env.STRIPE_SECRET);
 
@@ -151,7 +153,7 @@ export const stripeSessionId = async (req, res) => {
       },
     },
     // success and cancel urls
-    success_url: process.env.STRIPE_SUCCESS_URL,
+    success_url: `${process.env.STRIPE_SUCCESS_URL}/${item._id}`,
     cancel_url: process.env.STRIPE_CANCEL_URL,
   });
   // 7) add this session object to user in the db
@@ -160,4 +162,36 @@ export const stripeSessionId = async (req, res) => {
   res.send({
     sessionId: session.id,
   });
+};
+
+export const stripeSuccess = async(req,res) => {
+  try{
+    const {hotelId} = req.body
+
+    const user = await user.findById(req.user._id).exec()
+
+    if(!user.stripeSession) return;
+    const session = await stripe.checkout.sessions.retrieve(user.stripeSession.id);
+
+    if(session.payment_status === 'paid') {
+      const orderExist =await Order.findOne({"session.id": session.id }).exec();
+      if(orderExist) {
+        res.json({ success: true});
+      } else {
+        let newOrder = await new Order({
+          hotel: hotelId,
+          session,
+          orderedBy: user._id,
+        }).save();
+        //
+        await User.findByIdAndUpdate(user._id, {
+          $set: {stripeSession: {}},
+        });
+
+        res.json({ success: true});
+      }
+    }
+  } catch (err) {
+    console.log("STRIPE SUCCESS ERR",err);
+  }
 };
