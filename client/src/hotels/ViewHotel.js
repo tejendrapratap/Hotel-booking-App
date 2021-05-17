@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { read, diffDays } from "../actions/hotel";
+import { read, diffDays, isAlreadyBooked } from "../actions/hotel";
 import moment from "moment";
 import { useSelector } from "react-redux";
 import { getSessionId } from "../actions/stripe";
@@ -9,13 +9,24 @@ const ViewHotel = ({ match, history }) => {
   const [hotel, setHotel] = useState({});
   const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [alreadyBooked,setAlreadyBooked] = useState(false);
 
   const { auth } = useSelector((state) => ({ ...state }));
 
   useEffect(() => {
     loadSellerHotel();
   }, []);
-
+  useEffect(()=>{
+    if(auth && auth.token){
+       const res= alreadyBookedFun();
+       if(res && res.data && res.data.ok) setAlreadyBooked(true);
+       console.log(res);
+    }
+  },[])
+  const alreadyBookedFun =async()=>{
+    const res= await isAlreadyBooked(auth.token,match.params.hotelId);
+    return res;
+  }
   const loadSellerHotel = async () => {
     let res = await read(match.params.hotelId);
     //console.log(res);
@@ -25,6 +36,11 @@ const ViewHotel = ({ match, history }) => {
 
   const handleClick = async (e) => {
     e.preventDefault();
+
+    if(!auth || !auth.token){
+      history.push("/login");
+      return;
+    }
     setLoading(true);
     if (!auth) history.push("/login");
     console.log(auth.token, match.params.hotelId);
@@ -72,10 +88,12 @@ const ViewHotel = ({ match, history }) => {
             <button
               onClick={handleClick}
               className="btn btn-block btn-lg btn-primary mt-3"
-              disabled={loading}
+              disabled={loading || alreadyBooked}
             >
               {loading
                 ? "Loading..."
+                :alreadyBooked
+                ?"Alredy Booked"
                 : auth && auth.token
                 ? "Book Now"
                 : "Login to Book"}

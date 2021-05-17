@@ -55,3 +55,19 @@ export const diffDays = (from, to) => {
   const diff = Math.round(Math.abs((end - start) / day));
   return diff;
 };
+
+export const userHotelBookings = async(token)=>{
+  const res= await axios.get(`${process.env.REACT_APP_API}/user-hotel-bookings`,{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+}
+export const isAlreadyBooked = async(token,hotelId)=>{
+  const res= await axios.get(`${process.env.REACT_APP_API}/is-already-booked/${hotelId}`,{
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+}
+

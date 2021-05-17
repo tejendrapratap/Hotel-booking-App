@@ -1,5 +1,6 @@
 import User from "../models/user";
 import Hotel from "../models/hotel";
+import Order from '../models/order'
 import fs from "fs";
 export const create = async (req, res) => {
   console.log("Hotel fields====>", req.fields);
@@ -28,7 +29,7 @@ export const create = async (req, res) => {
 
 export const hotels = async (req, res) => {
   // take max 24 data as response
-  let all = await Hotel.find({})
+  let all = await Hotel.find({to:{$gte:new Date() },from :{$lte:new Date()}})
     .limit(24)
     .select("-image.data")
     .populate("postedBy", "_id name")
@@ -93,3 +94,25 @@ export const update = async (req, res) => {
     re.status(400).send("Hotel update failed. Try again");
   }
 };
+
+export const userHotelsBookings =async (req,res)=>{
+   const all= await Order.find({orderedBy:req.user._id}).select('session').populate('hotel','-image.data').populate('orderedBy',"_id name").exec();
+
+   return res.json(all);
+} 
+
+export const isAlreadyBooked =async (req,res)=>{
+   const {hoteId} = req.params;
+
+   //find orders of the currently logged in user
+   const userOrders= await Order.find({orderedBy: req.user._id}).select("hotel").exec();
+
+   //check if hotelid is found in userOrders array
+   let ids= [];
+   for( let i=0;i<userOrders.length;i++){
+      ids.push(userOrders[i].hotel.toString());
+   }
+   res.json({
+     ok:ids.includes(hoteId),
+   })
+} 
