@@ -8,9 +8,10 @@ const orderSchema = new mongoose.Schema(
             ref: "Hotel",
         },
         session: {},
-        orderedBy: {type: ObjectId, ref: "user" },
+        orderedBy: {type: ObjectId, ref: "User" },
     },
     { timestamps: true}
 );
 
 export default mongoose.model("Order", orderSchema);
+
