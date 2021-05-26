@@ -95,7 +95,14 @@ export const getAccountStatus = async (req, res) => {
 
 export const getAccountBalance = async (req, res) => {
   const user = await User.findById(req.user._id).exec();
-  const balance = 1;
+  let balance = 0;
+
+  const allBookedUserHotels= await Order.find({postedBy:req.user._id});
+  
+  for( let i=0;i<allBookedUserHotels.length;i++){
+    console.log(balance);
+    balance+= parseInt(allBookedUserHotels[i].session.amount_total);
+ }
   return res.json({balance:balance});
   // try {
   //   const balance = await stripe.balance.retrieve({
@@ -203,7 +210,8 @@ export const stripeSuccess = async (req, res) => {
 export const makePayment = async (req, res) => {
 
   const { data, price, hotelId } = req.body;
-
+  const item = await Hotel.findById(hotelId).exec(); 
+  const postedBy= item.postedBy;
   console.log("price===>", price);
   console.log("data===>", data);
   console.log("hotelId==>", hotelId);
@@ -284,6 +292,7 @@ hotelId==> 60a754ed0797e130442d6ab8
   let newOrder = await new Order({
     hotel: hotelId,
     session,  
+    postedBy,
     orderedBy: req.user._id,
   }).save();
 
