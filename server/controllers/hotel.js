@@ -29,11 +29,15 @@ export const create = async (req, res) => {
 
 export const hotels = async (req, res) => {
   // take max 24 data as response
-  let all = await Hotel.find({to:{$gte:new Date() },from :{$lte:new Date()}})
+  const date = new Date();
+  console.log("today Date===>",date);
+  let all = await Hotel.find({to:{$gte: new Date()}})
     .limit(24)
     .select("-image.data")
     .populate("postedBy", "_id name")
     .exec();
+
+    console.log(all);
   res.json(all);
 };
 
@@ -133,7 +137,8 @@ export const searchListings =async (req,res)=>{
    let result = await Hotel.find({
      location,
      bed,
-     to:{$gte:new Date(fromDate[0])},
+     to:{$gte:new Date(fromDate[0])},         //to is >=  (from input)
+     from:{$lte:new Date(fromDate[1])},       //from is <= (to input)
     }).select("-image.data").exec();
 
    res.json(result);
