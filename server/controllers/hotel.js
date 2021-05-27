@@ -29,15 +29,13 @@ export const create = async (req, res) => {
 
 export const hotels = async (req, res) => {
   // take max 24 data as response
-  const date = new Date();
-  console.log("today Date===>",date);
+
   let all = await Hotel.find({to:{$gte: new Date()}})
     .limit(24)
     .select("-image.data")
     .populate("postedBy", "_id name")
     .exec();
 
-    console.log(all);
   res.json(all);
 };
 
@@ -143,3 +141,26 @@ export const searchListings =async (req,res)=>{
 
    res.json(result);
 } 
+
+
+export const checkOrderPresent =async (req,res)=>{
+  console.log("In CheckOrderPresent");
+   const {hotelId} = req.params;
+  
+   //find orders of the currently logged in user
+   const hotelOrders= await Order.find({hotel: hotelId}).exec();
+
+   console.log("Hotel ORDERS==>",hotelOrders);
+   
+   if(hotelOrders.length){
+     return res.json({
+       ok:true,
+     })
+   }
+   else{
+    return res.json({
+      ok:false,
+    })
+   }
+ 
+}
