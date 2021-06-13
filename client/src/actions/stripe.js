@@ -65,34 +65,46 @@ export const getSessionId = async (token, hotelId) =>
     }
   );
 
-
-  export const stripeSuccessRequest = async(token,hotelId) => await axios.post(
-    `${process.env.REACT_APP_API}/stripe-success`,{hotelId},{
+export const stripeSuccessRequest = async (token, hotelId) =>
+  await axios.post(
+    `${process.env.REACT_APP_API}/stripe-success`,
+    { hotelId },
+    {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     }
   );
 
+export const makePayment = async (token, data, price, hotelId) => {
+  const res = await axios.post(
+    `${process.env.REACT_APP_API}/payment`,
+    { data, price, hotelId },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
+  return res;
+};
+export const activateAccount = async (
+  token,
+  holderName,
+  accountNo,
+  ifsc,
+  password
+) => {
+  const res = await axios.post(
+    `${process.env.REACT_APP_API}/activate-account`,
+    { holderName, accountNo, ifsc, password },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
 
-  export const makePayment = async(token,data,price,hotelId) =>{
-     const res=  await axios.post(
-      `${process.env.REACT_APP_API}/payment`,{data,price,hotelId},{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      } );
-
-      return res;
-  }
-  export const activateAccount = async(token,holderName,accountNo,ifsc,password) =>{
-     const res=  await axios.post(
-      `${process.env.REACT_APP_API}/activate-account`,{holderName,accountNo,ifsc,password},{
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      } );
-
-      return res;
-  }
+  return res;
+};
